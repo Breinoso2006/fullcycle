@@ -55,3 +55,4 @@
 ## Observações
 - `exec "$@"` => no final de um arquivo .sh significa que irá executar o comando que vier depois dele.
 - `http://host.docker.internal:{porta}` => para acessar algum recurso da sua máquina estando no container docker.
+- `docker build -t {tag}/{imagem} {diretório} -f {caminho até o dockerfile desejado}` =>  caso estejamos trabalhando com 2 dockerfile's na mesma pasta (local/prod).
