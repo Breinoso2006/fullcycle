@@ -2,6 +2,7 @@
 
 ## Comandos utilizados ao longo das aulas e suas respectivas funções
 
+### Padrão
 - `docker ps` => mostrar os containers ativos.
   - -a, mostra os containers ativos e inativos.
   - -q, mostra apenas os id's dos containers.
@@ -25,7 +26,11 @@
 - `docker rmi {imagem}` => apagar imagem específica. 
 - `docker build -t {nome da tag ou usuário}/{nome da imagem}:{versão} {diretório onde está o arquivo}` => criar sua própria imagem a partir de um Dockerfile.
 - `docker push {imagem}` => para subir uma imagem proprietária no dockerhub.
-
+### Network
+- `docker network` => mostra os comandos relacionados a redes.
+- `docker network inspect {tipo}` => inspecionar rede.
+- `docker network create --driver {tipo de rede} {nome da rede}` => para criar uma rede nova.
+- `docker network connect {rede} {container}` => para conectar um container a determinada rede.
 ## Estrutura no docker ps
 
 - CONTAINER_ID: literalmente um id que representa o container, um hash
@@ -48,4 +53,5 @@
 - `EXPOSE` => para expôr uma porta.
 
 ## Observações
-- `exec "$@"` no final de um arquivo .sh significa que irá executar o comando que vier depois dele.
+- `exec "$@"` => no final de um arquivo .sh significa que irá executar o comando que vier depois dele.
+- `http://host.docker.internal:{porta}` => para acessar algum recurso da sua máquina estando no container docker.
