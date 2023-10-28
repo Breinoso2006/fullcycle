@@ -25,6 +25,8 @@
 - `docker images` => ver as imagens que estão baixadas no computador.
 - `docker rmi {imagem}` => apagar imagem específica. 
 - `docker build -t {nome da tag ou usuário}/{nome da imagem}:{versão} {diretório onde está o arquivo}` => criar sua própria imagem a partir de um Dockerfile.
+  - -t, serve para taguear uma imagem.
+  - -f, caso mude o nome padrão do Dockerfile.
 - `docker push {imagem}` => para subir uma imagem proprietária no dockerhub.
 ### Network
 - `docker network` => mostra os comandos relacionados a redes.
