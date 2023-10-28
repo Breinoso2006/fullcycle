@@ -1,3 +1,0 @@
-Esse arquivo foi editado a partir de um container, em um volume compartilhado entre o pc e o mesmo.
-Muito interessante inclusive, pois ele salva tamb�m na m�quina! Super �til.
-docker run --rm -it -v $(pwd):/usr/src/app -p 3000:3000 node bash

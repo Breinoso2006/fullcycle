@@ -47,7 +47,7 @@
 - `RUN {comando}` => comando que será executado ao longo do build.
 - `WORKDIR` => para criar uma pasta dentro do container e nos deixar ali dentroquando entrarmos.
 - `COPY {arquivo ou pasta a ser copiada} {para onde ela irá no container}` => copiar arquivo que está dentro do computador para o container.
-- `ENTRYPOINT [comando, parâmetro]` => executará o comando em questão, mas não será substituído.
+- `ENTRYPOINT [comando, parâmetro]` => executará o comando em questão, mas não pode ser substituído pelo usuário.
 - `CMD [comando, parâmetro]` => executará o comando em questão, podendo ser substituído. Entra como parâmetro do entrypoint e é considerado como "padrão" caso o usuário não passe outro parâmetro.
 - `ENV {variável}` => para criar variáveis de ambiente.
 - `EXPOSE` => para expôr uma porta.
