@@ -1,8 +1,4 @@
 # Docker
-
-## Comandos utilizados ao longo das aulas e suas respectivas funções
-
-### Padrão
 - `docker ps` => mostrar os containers ativos.
   - -a, mostra os containers ativos e inativos.
   - -q, mostra apenas os id's dos containers.
@@ -28,7 +24,7 @@
   - -t, serve para taguear uma imagem.
   - -f, caso mude o nome padrão do Dockerfile.
 - `docker push {imagem}` => para subir uma imagem proprietária no dockerhub.
-### Network
+## Network
 - `docker network` => mostra os comandos relacionados a redes.
 - `docker network inspect {tipo}` => inspecionar rede.
 - `docker network create --driver {tipo de rede} {nome da rede}` => para criar uma rede nova.
@@ -58,3 +54,7 @@
 - `exec "$@"` => no final de um arquivo .sh significa que irá executar o comando que vier depois dele.
 - `http://host.docker.internal:{porta}` => para acessar algum recurso da sua máquina estando no container docker.
 - `docker build -t {tag}/{imagem} {diretório} -f {caminho até o dockerfile desejado}` =>  caso estejamos trabalhando com 2 dockerfile's na mesma pasta (local/prod).
+
+# Docker-compose
+- `docker-compose up` => subir os serviços do arquivo docker-compose da pasta que você está
+- `docker-compose down` => descer os serviços do arquivo docker-compose da pasta que você está
