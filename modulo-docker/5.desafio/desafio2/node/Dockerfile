@@ -2,9 +2,9 @@ FROM node:latest
 
 WORKDIR /usr/src/app
 
-COPY index.js .
-
-RUN npm install express mysql2 @ngneat/falso
+COPY /javascript/package.json .
+RUN npm install
+COPY . .
 
 RUN apt update && \
     apt install -y wget netcat-traditional && \
