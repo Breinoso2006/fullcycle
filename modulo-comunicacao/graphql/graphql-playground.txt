@@ -1,0 +1,56 @@
+mutation createCategory {
+  createCategory(input: {name: "Saúde", description: "Cursos de Saúde"}) {
+    id
+    name
+    description
+  }
+}
+
+mutation createCourse{
+  createCourse(input: {name: "Full Cycle", description: "Brabo demais", categoryId: "8acbd537-978e-4b87-ad5b-21dd568e5220"}) {
+    id
+    name
+    description
+  }
+}
+
+query queryCategories {
+  categories {
+    id
+    name
+    description
+  }
+}
+
+query queryCategoriesWithCourses {
+  categories {
+    id
+    name
+    description
+    courses {
+      id
+      name
+    }
+  }
+}
+
+query queryCourses {
+  courses {
+    id
+    name
+    description
+  }
+}
+
+query queryCoursesWithCategory {
+  courses {
+    id
+    name
+    description    
+    category {
+      id
+      name
+      description
+    }
+  }
+}
