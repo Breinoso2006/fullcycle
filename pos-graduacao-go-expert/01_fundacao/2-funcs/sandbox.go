@@ -10,6 +10,13 @@ func main() {
 	// fmt.Println(valor, err)
 	fmt.Println(soma2(1, 2, 3, 4, 5))
 
+	// closure
+	result := func() int {
+		fmt.Printf("%d\n", 2)
+		return 2
+	}()
+	fmt.Println(result)
+
 }
 
 // func soma(a, b int) (int, error) { // pode ser também algo como func soma(a int, b int) int
