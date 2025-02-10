@@ -2,8 +2,15 @@ package main
 
 import "fmt"
 
+// Interfaces só podem implementar métodos, não atributos
 type Animal interface {
 	Andar()
+	// Saltar() teria que ser implementado por todos os tipos que implementam a interface Animal
+}
+
+func FormaDeAndar(animal Animal) {
+	fmt.Print("Como eu ando?\n")
+	animal.Andar()
 }
 
 type Pessoa struct {
@@ -23,9 +30,12 @@ func (f Funcionario) promover() float64 {
 	return f.Salario
 }
 
-func Andar(animal Animal) {
-	fmt.Println("Andando...")
+func (p Pessoa) Andar() {
+	fmt.Println("Sou uma pessoa, e ando descalço.")
+}
 
+func (f Funcionario) Andar() {
+	fmt.Println("Sou um funcionário, ando de sapato.")
 }
 
 func main() {
@@ -34,8 +44,7 @@ func main() {
 		Idade:  28,
 		Altura: 1.62,
 	}
-
-	fmt.Println(bruno)
+	// fmt.Println(bruno)
 
 	// no go utilizamos composição ao invés de herança
 	aurelio := Funcionario{
@@ -48,10 +57,15 @@ func main() {
 		Ativo:   true,
 	}
 
-	fmt.Println(aurelio)
-	aurelio.promover()
-	fmt.Println(aurelio)
+	// fmt.Println(aurelio)
+	// aurelio.promover()
+	// fmt.Println(aurelio)
 	// o método promover não altera o valor do salário caso não seja atribuído a uma variável
-	aurelio.Salario = aurelio.promover()
-	fmt.Println(aurelio)
+	// aurelio.Salario = aurelio.promover()
+	// fmt.Println(aurelio)
+	// aurelio.Andar()
+
+	// Ambos implementam a interface Animal
+	FormaDeAndar(aurelio)
+	FormaDeAndar(bruno)
 }
