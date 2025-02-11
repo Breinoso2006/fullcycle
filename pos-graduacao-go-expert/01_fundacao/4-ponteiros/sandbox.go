@@ -2,14 +2,37 @@ package main
 
 func main() {
 	// testes()
-	var (
-		a int = 10
-		b int = 20
-	)
+	// 	var (
+	// 		a int = 10
+	// 		b int = 20
+	// 	)
 
-	println(soma(a, b))
-	println(somaETrocaValores(&a, &b))
-	println(a, b)
+	// 	println(soma(a, b))
+	// 	println(somaETrocaValores(&a, &b))
+	// 	println(a, b)
+
+	var poupanca Conta = Conta{
+		saldo: 1000,
+	}
+
+	println(poupanca.Deposito(200))
+	println(poupanca.saldo)
+
+	var corrente Conta = *NewConta()
+	println(corrente.saldo)
+}
+
+type Conta struct {
+	saldo int
+}
+
+func (c *Conta) Deposito(valor int) int {
+	c.saldo += valor
+	return c.saldo
+}
+
+func NewConta() *Conta {
+	return &Conta{saldo: 0}
 }
 
 func soma(a, b int) int {
