@@ -1,0 +1,13 @@
+CEP: 28894-052
+Logradouro: Rua dos Periquitos
+Complemento: 
+Unidade: 
+Bairro: Residencial Camping do Bosque
+Localidade: Rio das Ostras
+UF: RJ
+Estado: Rio de Janeiro
+Região: Sudeste
+IBGE: 3304524
+GIA: 
+DDD: 22
+SIAFI: 2921
