@@ -74,6 +74,41 @@ func selectProduct(db *sql.DB, id string) (*Product, error) {
 	return &product, nil
 }
 
+func selectAllProducts (db *sql.DB) ([]Product, error) {
+	rows, err := db.Query("select id, name, price from products")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	
+	var products []Product
+	for rows.Next() {
+		var p Product
+		err = rows.Scan(&p.ID, &p.Name, &p.Price)
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, p)
+	}
+	return products, nil
+}
+
+func deleteProcuct(db *sql.DB, id string) error {
+	// Prepara a query para ser executada, evitando SQL Injection
+	stmt, err := db.Prepare("delete from products where id = ?")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	// Executa a query com os parâmetros passados. O _ pode ser substituído por algo que você queira receber de retorno
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func main() {
 	// Abre a conexão com o banco de dados, porém só valida os parâmetros de conexão quando a conexão é usada
 	db, err := sql.Open("mysql", "root:root@tcp(localhost:3306)/mydb")
@@ -100,4 +135,17 @@ func main() {
 	}
 	fmt.Printf("Product: %v, possui o preço de %.2f reais", p.Name, p.Price)
 
+	err = deleteProcuct(db, "45437f11-6b99-4c45-bc3d-e3e92178f8c3")
+	if err != nil {
+		panic(err)
+	}
+
+	products, err := selectAllProducts(db)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("\nLista de produtos:")
+	for _, p := range products {
+		fmt.Printf("ID: %s, Nome: %s, Preço: %.2f\n", p.ID, p.Name, p.Price)
+	}
 }
