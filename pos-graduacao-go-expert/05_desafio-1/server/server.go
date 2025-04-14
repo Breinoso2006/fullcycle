@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"time"
 
 	"gorm.io/driver/sqlite"
@@ -46,24 +45,32 @@ func DolarQuoteNow(w http.ResponseWriter, r *http.Request) {
 
 	req, err := http.NewRequestWithContext(ctx, "GET", "https://economia.awesomeapi.com.br/json/last/USD-BRL", nil)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error creating request: %v\n", err)
+		fmt.Printf("Error creating request: %v\n", err)
+		return
 	}
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error making request: %v\n", err)
+		if ctx.Err() == context.DeadlineExceeded {
+			fmt.Println("Request timed out after 200ms.")
+			return
+		}
+		fmt.Printf("Error making request: %v\n", err)
+		return
 	}
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading response body: %v\n", err)
+		fmt.Printf("Error reading response body: %v\n", err)
+		return
 	}
 
 	var data DolarFromApi
 	err = json.Unmarshal(body, &data)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error unmarshalling JSON: %v\n", err)
+		fmt.Printf("Error unmarshalling JSON: %v\n", err)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -73,9 +80,10 @@ func DolarQuoteNow(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(response)
 
-	RegisterQuoteInDatabase(data.Usdbrl.Bid)
+	err = RegisterQuoteInDatabase(data.Usdbrl.Bid)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error registering quote in database: %v\n", err)
+		fmt.Printf("Error registering quote in database: %v\n", err)
+		return
 	}
 }
 
@@ -85,21 +93,28 @@ func RegisterQuoteInDatabase(bid string) error {
 
 	db, err := gorm.Open(sqlite.Open("meubanco.db"), &gorm.Config{})
 	if err != nil {
-		return fmt.Errorf("failed to connect to database: %w", err)
+		fmt.Printf("Error connecting to database: %v\n", err)
+		return err
 	}
 	err = db.AutoMigrate(&DolarQuote{})
 	if err != nil {
-		return fmt.Errorf("failed to migrate database: %w", err)
+		fmt.Printf("Error migrating database: %v\n", err)
+		return err
 	}
+	
 	quote := DolarQuote{Price: bid}
 	err = db.WithContext(ctx).Create(&quote).Error
 	if err != nil {
-		return fmt.Errorf("failed to create quote: %w", err)
+		if ctx.Err() == context.DeadlineExceeded {
+			fmt.Printf("Database operation timed out after 10ms.")
+			return err
+		}
+		fmt.Printf("Error creating quote: %v\n", err)
+		return err
 	}
 	return nil
 }
 
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Healthy"))
-	w.WriteHeader(http.StatusOK)
 }

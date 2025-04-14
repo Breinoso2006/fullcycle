@@ -20,29 +20,37 @@ func main() {
 
 	req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost:8080/cotacao", nil)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error creating request: %v\n", err)
+		fmt.Printf("Error creating request: %v\n", err)
+		return
 	}
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error making request: %v\n", err)
+		if ctx.Err() == context.DeadlineExceeded {
+			fmt.Printf("Request timed out after 300ms.\n")
+			return
+		}
+		fmt.Printf("Error making request: %v\n", err)
+		return
 	}
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading response body: %v\n", err)
+		fmt.Printf("Error reading response body: %v\n", err)
+		return
 	}
 
 	var dolar Dolar
 	err = json.Unmarshal(body, &dolar)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error unmarshalling JSON: %v\n", err)
+		fmt.Printf("Error unmarshalling JSON: %v\n", err)
+		return
 	}
 
 	err = RegisterQuoteInTxt(dolar.Bid)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error registering quote in txt: %v\n", err)
+		fmt.Printf("Error registering quote in txt: %v\n", err)
 		return
 	}
 }
@@ -50,11 +58,17 @@ func main() {
 func RegisterQuoteInTxt(bid string) error {
 	file, err := os.OpenFile("cotacao.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
-		return fmt.Errorf("Error opening/creating file: %w", err)
+		fmt.Printf("Error opening file: %v\n", err)
+		return err
 	}
 	defer file.Close()
 
 	_, err = file.WriteString(fmt.Sprintf("Dolar: %s\n", bid))
+	if err != nil {
+		fmt.Printf("Error writing to file: %v\n", err)
+		return err
+	}
 
-	return err
+	fmt.Printf("Dolar: %v\n", bid)
+	return nil
 }
