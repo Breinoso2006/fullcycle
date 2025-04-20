@@ -7,10 +7,9 @@ import (
 )
 
 func main() {
-	m := math.Math{
-		A: 10,
-		B: 20,
-	}
-	s := m.Sum()
+	m := math.NewMath(1, 2)
+	s := m.Add()
 	fmt.Println(s)
+	// apesar de conseguir printar m, não consigo acessar seus atributos
+	fmt.Println(m)
 }
