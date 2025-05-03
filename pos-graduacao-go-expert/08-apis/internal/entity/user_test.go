@@ -18,7 +18,7 @@ func TestNewUser(t *testing.T) {
 	assert.Equal(t, "Bruno Reinoso", user.Name)
 	assert.Equal(t, "bruno@123.com", user.Email)
 
-	assert.True(t, user.ComparePassword("123456"))
-	assert.False(t, user.ComparePassword("1234567"))
+	assert.True(t, user.ValidatePassword("123456"))
+	assert.False(t, user.ValidatePassword("1234567"))
 	assert.NotEqual(t, user.Password, "123456")
 }
