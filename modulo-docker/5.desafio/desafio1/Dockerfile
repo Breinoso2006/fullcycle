@@ -1,4 +1,4 @@
-cFROM golang:alpine as builder
+FROM golang:alpine as builder
 
 WORKDIR /go/src
 
