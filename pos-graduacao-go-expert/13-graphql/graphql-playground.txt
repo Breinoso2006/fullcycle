@@ -1,0 +1,56 @@
+mutation createCategory{
+  createCategory(data: {name: "História", description: "Cursos de História"}){
+    id
+    name
+    description
+  }
+}
+
+mutation createCourse{
+  createCourse(data: {name: "História da Arte", description: "Graduação de História da Arte", categoryId: "15d96b8c-2999-44e2-b3b3-ecb9801edcc4"}){
+    id
+    name
+    description
+  }
+}
+
+query queryCategories{
+  categories{
+    id
+    name
+    description
+  }
+}
+
+query queryCourses{
+  courses{
+    id
+    name
+    description
+  }
+}
+
+query queryCategoriesWithCourses{
+  categories{
+    id
+    name
+    courses {
+      id
+      name
+      description
+    }
+  }
+}
+
+query queryCoursesWithCategory{
+  courses{
+    id
+    name
+    description
+    category{
+      id
+      name
+      description
+    }
+  }
+}

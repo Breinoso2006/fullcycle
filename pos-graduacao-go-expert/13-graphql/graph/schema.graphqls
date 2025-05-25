@@ -1,0 +1,39 @@
+# Category e Course são os tipos de dados que vamos manipular
+type Category {
+  id: ID!
+  name: String!
+  description: String
+  courses: [Course!]!
+}
+
+type Course {
+  id: ID!
+  name: String!
+  description: String
+  category: Category!
+}
+
+# Inputs servem para criar novos dados
+input NewCategory {
+  name: String!
+  description: String
+}
+
+input NewCourse {
+  name: String!
+  description: String
+  categoryId: ID!
+}
+
+# Query é o ponto de entrada para as consultas
+type Query {
+  categories: [Category!]!
+  courses: [Course!]!
+}
+
+# Mutation é o ponto de entrada para as mutações
+# A entrada é feita através de inputs e a saída é feita através dos tipos
+type Mutation {
+  createCategory(data: NewCategory!): Category!
+  createCourse(data: NewCourse!): Course!
+}
