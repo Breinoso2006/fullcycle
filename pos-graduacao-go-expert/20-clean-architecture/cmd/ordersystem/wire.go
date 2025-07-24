@@ -21,6 +21,7 @@ var setOrderRepositoryDependency = wire.NewSet(
 )
 
 var setEventDispatcherDependency = wire.NewSet(
+
 	events.NewEventDispatcher,
 	event.NewOrderCreated,
 	wire.Bind(new(events.EventInterface), new(*event.OrderCreated)),
@@ -39,6 +40,14 @@ func NewCreateOrderUseCase(db *sql.DB, eventDispatcher events.EventDispatcherInt
 		usecase.NewCreateOrderUseCase,
 	)
 	return &usecase.CreateOrderUseCase{}
+}
+
+func NewListOrdersUseCase(db *sql.DB) *usecase.ListOrdersUseCase {
+	wire.Build(
+		setOrderRepositoryDependency,
+		usecase.NewListOrdersUseCase,
+	)
+	return &usecase.ListOrdersUseCase{}
 }
 
 func NewWebOrderHandler(db *sql.DB, eventDispatcher events.EventDispatcherInterface) *web.WebOrderHandler {

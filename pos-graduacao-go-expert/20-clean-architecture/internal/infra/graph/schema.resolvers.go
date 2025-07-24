@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/breinoso2006/fullcycle/pos-graduacao-go-expert/20-clean-architecture/internal/infra/graph/model"
 	"github.com/breinoso2006/fullcycle/pos-graduacao-go-expert/20-clean-architecture/internal/usecase"
@@ -30,7 +31,29 @@ func (r *mutationResolver) CreateOrder(ctx context.Context, input *model.OrderIn
 	}, nil
 }
 
+func (r *queryResolver) Orders(ctx context.Context) ([]*model.Order, error) {
+	ordersOutput, err := r.ListOrdersUseCase.Execute()
+	if err != nil {
+		return nil, fmt.Errorf("failed to list orders: %w", err)
+	}
+
+	var result []*model.Order
+	for _, order := range ordersOutput.Orders {
+		result = append(result, &model.Order{
+			ID:         order.ID,
+			Price:      float64(order.Price),
+			Tax:        float64(order.Tax),
+			FinalPrice: float64(order.FinalPrice),
+		})
+	}
+	return result, nil
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
+// Query returns QueryResolver implementation.
+func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
+
 type mutationResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }

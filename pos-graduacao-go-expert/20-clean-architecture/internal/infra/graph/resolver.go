@@ -8,4 +8,5 @@ import "github.com/breinoso2006/fullcycle/pos-graduacao-go-expert/20-clean-archi
 
 type Resolver struct {
 	CreateOrderUseCase usecase.CreateOrderUseCase
+	ListOrdersUseCase  usecase.ListOrdersUseCase
 }
