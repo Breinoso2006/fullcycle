@@ -1,0 +1,21 @@
+# Ignore development files
+.git
+.gitignore
+README.md
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Ignore temporary files
+.DS_Store
+.vscode
+.idea
+*.tmp
+*.log
+
+# Ignore local data
+.docker/
+tmp/
+
+# Ignore test files (optional)
+*_test.go
