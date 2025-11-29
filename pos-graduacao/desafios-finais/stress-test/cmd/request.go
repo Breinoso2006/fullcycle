@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 	"sync"
 	"time"
 
@@ -26,10 +25,10 @@ var request = &cobra.Command{
 
 		limitChannel := make(chan struct{}, concurrency)
 		var wg sync.WaitGroup
-		tempo := time.Now()
-		dist := make(map[string]int)
-		ch := make(chan int)
-		ch = <- 
+		var mu sync.Mutex
+		startTime := time.Now()
+		statusDist := make(map[int]int)
+		totalRequests := 0
 
 		for i := 0; i < requests; i++ {
 			limitChannel <- struct{}{}
@@ -37,19 +36,20 @@ var request = &cobra.Command{
 			go func(idx int) {
 				defer wg.Done()
 				defer func() { <-limitChannel }()
-				status := getUrl(url)
-				if dist[status] {
-					dist[status] += 1
-				} else {
-					dist[status] = 1
-				}
+				
+				statusCode := makeRequest(url)
+				
+				mu.Lock()
+				statusDist[statusCode]++
+				totalRequests++
+				mu.Unlock()
 			}(i)
 		}
 
-		
 		wg.Wait()
-		fmt.Printf("Tempo total de execução: %s\n", time.Since(tempo))
-		fmt.Println("All done")
+		totalTime := time.Since(startTime)
+		
+		generateReport(totalTime, totalRequests, statusDist)
 	},
 }
 
@@ -60,12 +60,29 @@ func init() {
 	request.Flags().IntP("concurrency", "c", 0, "Número de requests simultâneos a serem enviados durante o teste de carga")
 }
 
-func getUrl(url string) string {
+func generateReport(totalTime time.Duration, totalRequests int, statusDist map[int]int) {
+	fmt.Println("\n========== RELATÓRIO DO TESTE DE CARGA ==========")
+	fmt.Printf("Tempo total gasto na execução: %s\n", totalTime)
+	fmt.Printf("Quantidade total de requests realizados: %d\n", totalRequests)
+		
+	fmt.Println("\nDistribuição de códigos de status HTTP:")
+	for status, count := range statusDist {
+		if status == 0 {
+			fmt.Printf("  Erro de conexão/timeout: %d requests\n", count)
+		} else {
+			fmt.Printf("  Status %d: %d requests\n", status, count)
+		}
+	}
+	fmt.Println("=================================================")
+}
+
+func makeRequest(url string) int {
 	response, err := http.Get(url)
 	if err != nil {
-		fmt.Println("Erro ao fazer a requisição:", err.Error())
-		return strconv.Itoa(response.StatusCode)
+		// Retorna 0 para erros de conexão/timeout
+		return 0
 	}
-
-	return strconv.Itoa(response.StatusCode)
+	defer response.Body.Close()
+	
+	return response.StatusCode
 }
