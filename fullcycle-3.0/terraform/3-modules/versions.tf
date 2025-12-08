@@ -1,0 +1,16 @@
+terraform {
+  required_version = ">=1.14.1"
+  required_providers {
+    aws = ">=6.24.0"
+    local = ">= 2.6.1"
+  }
+  backend "s3" {
+    bucket = "fullcycle-terraform-state-bruno"
+    key    = "terraform.tfstate"
+    region = "sa-east-1"
+  }
+}
+
+provider "aws" {
+  region = "sa-east-1"
+}

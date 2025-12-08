@@ -55,11 +55,6 @@ resource "aws_eks_cluster" "cluster" {
     security_group_ids = [aws_security_group.sg.id]
   }
 
-  access_config {
-    authentication_mode = "API"
-    bootstrap_cluster_creator_admin_permissions = true
-  }
-
   depends_on = [ 
     # aws_cloudwatch_log_group.log,
     aws_iam_role_policy_attachment.cluster-AmazonEKSClusterPolicy,
