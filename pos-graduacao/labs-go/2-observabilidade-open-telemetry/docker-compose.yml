@@ -1,0 +1,55 @@
+services:
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - otel-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9411/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  orchestrator:
+    build:
+      context: ./orchestrator
+      dockerfile: Dockerfile
+    container_name: orchestrator
+    environment:
+      - PORT=8081
+      - WEATHER_API_KEY=${WEATHER_API_KEY}
+      - SERVICE_NAME=go-otel-orchestrator
+      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+    ports:
+      - "8081:8081"
+    networks:
+      - otel-network
+    depends_on:
+      zipkin:
+        condition: service_healthy
+    restart: unless-stopped
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: server
+    environment:
+      - PORT=8080
+      - ORCHESTRATOR_URL=http://orchestrator:8081
+      - SERVICE_NAME=go-otel-server
+      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+    ports:
+      - "8080:8080"
+    networks:
+      - otel-network
+    depends_on:
+      - orchestrator
+      - zipkin
+    restart: unless-stopped
+
+networks:
+  otel-network:
+    driver: bridge

@@ -1,0 +1,6 @@
+# Ignore environment files with sensitive data
+orchestrator/cmd/.env
+server/cmd/.env
+
+# Ignore .env in root (if created)
+.env
