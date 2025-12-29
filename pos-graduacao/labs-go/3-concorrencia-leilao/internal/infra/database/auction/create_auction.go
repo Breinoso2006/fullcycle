@@ -5,7 +5,11 @@ import (
 	"fullcycle-auction_go/configuration/logger"
 	"fullcycle-auction_go/internal/entity/auction_entity"
 	"fullcycle-auction_go/internal/internal_error"
+	"os"
+	"sync"
+	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -19,13 +23,20 @@ type AuctionEntityMongo struct {
 	Timestamp   int64                           `bson:"timestamp"`
 }
 type AuctionRepository struct {
-	Collection *mongo.Collection
+	Collection      *mongo.Collection
+	auctionInterval time.Duration
+	mu              sync.Mutex
 }
 
 func NewAuctionRepository(database *mongo.Database) *AuctionRepository {
-	return &AuctionRepository{
-		Collection: database.Collection("auctions"),
+	auctionRepo := &AuctionRepository{
+		Collection:      database.Collection("auctions"),
+		auctionInterval: getAuctionInterval(),
 	}
+
+	auctionRepo.startAuctionMonitor(context.Background())
+
+	return auctionRepo
 }
 
 func (ar *AuctionRepository) CreateAuction(
@@ -47,4 +58,66 @@ func (ar *AuctionRepository) CreateAuction(
 	}
 
 	return nil
+}
+
+// getAuctionInterval reads the AUCTION_INTERVAL environment variable
+// and returns the duration for auction validity. Default is 5 minutes.
+func getAuctionInterval() time.Duration {
+	auctionInterval := os.Getenv("AUCTION_INTERVAL")
+	duration, err := time.ParseDuration(auctionInterval)
+	if err != nil {
+		return time.Minute * 5
+	}
+
+	return duration
+}
+
+// startAuctionMonitor starts a goroutine that periodically checks for expired auctions
+// and automatically closes them by updating their status to Completed.
+func (ar *AuctionRepository) startAuctionMonitor(ctx context.Context) {
+	ticker := time.NewTicker(ar.auctionInterval)
+
+	go func() {
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-ticker.C:
+				ar.closeExpiredAuctions(ctx)
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+}
+
+// closeExpiredAuctions finds all active auctions that have exceeded their duration
+// and updates their status to Completed.
+func (ar *AuctionRepository) closeExpiredAuctions(ctx context.Context) {
+	ar.mu.Lock()
+	defer ar.mu.Unlock()
+
+	now := time.Now().Unix()
+	expirationTime := now - int64(ar.auctionInterval.Seconds())
+
+	filter := bson.M{
+		"status":    auction_entity.Active,
+		"timestamp": bson.M{"$lte": expirationTime},
+	}
+
+	update := bson.M{
+		"$set": bson.M{
+			"status": auction_entity.Completed,
+		},
+	}
+
+	result, err := ar.Collection.UpdateMany(ctx, filter, update)
+	if err != nil {
+		logger.Error("Error trying to close expired auctions", err)
+		return
+	}
+
+	if result.ModifiedCount > 0 {
+		logger.Info("Closed expired auctions")
+	}
 }
