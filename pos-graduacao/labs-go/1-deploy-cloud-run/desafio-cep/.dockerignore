@@ -1,0 +1,25 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+readme.md
+README.md
+
+# Tests
+*_test.go
+
+# IDE
+.vscode
+.idea
+
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+main
+
+# Output
+*.out
